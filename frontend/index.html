@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÓRTICE - Calculadora de Estructuras</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- VISTA 1: PANTALLA DE LOGIN -->
+    <main id="vistaLogin" class="vista-login">
+        <section class="tarjeta-login" aria-labelledby="tituloLogin">
+            <div class="marca-login">
+                <h1 id="tituloLogin">VÓRTICE</h1>
+                <p>Calculadora de Estructuras</p>
+            </div>
+
+            <div id="alertaLogin" class="alerta alerta-error oculto" role="alert"></div>
+
+            <form id="formularioLogin" class="formulario-vertical" novalidate>
+                <div class="input-group">
+                    <label for="loginUsername">Usuario</label>
+                    <input
+                        type="text"
+                        id="loginUsername"
+                        name="username"
+                        autocomplete="username"
+                        placeholder="Ej. admin"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        autocomplete="current-password"
+                        placeholder="Ingresa tu contraseña"
+                        required
+                    >
+                </div>
+
+                <button type="submit" id="btnIniciarSesion" class="main-btn">
+                    INICIAR SESIÓN
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- APLICACIÓN AUTENTICADA (CALCULADORA + PANEL ADMIN) -->
+    <div id="vistaAplicacion" class="container oculto">
+        <!-- BARRA SUPERIOR -->
+        <header class="barra-superior">
+            <div class="identidad-app">
+                <h1>VÓRTICE</h1>
+                <span class="subtitulo-app">Calculadora de Estructuras</span>
+            </div>
+
+            <div class="controles-sesion">
+                <span class="etiqueta-usuario">
+                    Sesión: <strong id="nombreUsuarioActual"></strong>
+                    <span id="badgeRolUsuario" class="badge-rol"></span>
+                </span>
+                <button
+                    type="button"
+                    id="btnAlternarAdmin"
+                    class="btn-secundario oculto"
+                >
+                    Panel Admin
+                </button>
+                <button type="button" id="btnCerrarSesion" class="btn-peligro">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </header>
+
+        <!-- VISTA 2: CALCULADORA DE ESTRUCTURAS -->
+        <section id="vistaCalculadora" aria-label="Calculadora de Estructuras">
+            <div id="alertaCalculo" class="alerta alerta-error oculto" role="alert"></div>
+
+            <div class="main-content">
+                <div class="config-grid">
+                    <div class="input-group">
+                        <label for="tipoTecho">Tipo</label>
+                        <select id="tipoTecho">
+                            <option value="piramide">Pirámide</option>
+                            <option value="normal">Cuatro Aguas</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="largo">Largo (m)</label>
+                        <input type="number" id="largo" step="0.01" min="0.01" value="12.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="ancho">Ancho (m)</label>
+                        <input type="number" id="ancho" step="0.01" min="0.01" value="10.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="alto">Alto (m)</label>
+                        <input type="number" id="alto" step="0.01" min="0.01" value="1.80">
+                    </div>
+                    <div class="input-group oculto" id="boxCaballete">
+                        <label for="caballete">Caballete (m)</label>
+                        <input type="number" id="caballete" step="0.01" min="0" value="2.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="alero">Alero (m)</label>
+                        <input type="number" id="alero" step="0.01" min="0" value="0.62">
+                    </div>
+                    <div class="input-group">
+                        <label for="cantT1">Cant. T1</label>
+                        <input type="number" id="cantT1" step="1" min="0" value="5">
+                    </div>
+                    <div class="input-group">
+                        <label for="cantT2">Cant. T2</label>
+                        <input type="number" id="cantT2" step="1" min="0" value="3">
+                    </div>
+                    <div class="input-group">
+                        <label for="sepC">Sep. Cost. (m)</label>
+                        <input type="number" id="sepC" step="0.01" min="0.01" value="1.00">
+                    </div>
+                    <div class="input-group">
+                        <label for="anchoU">Ancho Útil (m)</label>
+                        <input type="number" id="anchoU" step="0.01" min="0.01" value="1.00">
+                    </div>
+                </div>
+
+                <div class="visualizer-container">
+                    <canvas id="canvasTecho" width="400" height="250"></canvas>
+                </div>
+            </div>
+
+            <button type="button" id="btnCalcular" class="main-btn">
+                CALCULAR ESTRUCTURA
+            </button>
+
+            <div id="resultados" class="results-area oculto">
+                <div class="summary-card">
+                    <div>
+                        <small>Vigas Total</small><br>
+                        <b id="totalEstructura">0.00 m</b>
+                    </div>
+                    <div>
+                        <small>Costaneras Total</small><br>
+                        <b id="totalCostanerasMetraje">0.00 m</b>
+                    </div>
+                    <div>
+                        <small>Caballete</small><br>
+                        <b id="largoCaballeteRes">0.00 m</b>
+                    </div>
+                </div>
+
+                <div class="report-grid">
+                    <div class="card">
+                        <h3>Tensores</h3>
+                        <div id="resTensores"></div>
+                    </div>
+                    <div class="card">
+                        <h3>Costaneras</h3>
+                        <div id="resCostaneras"></div>
+                    </div>
+                    <div class="card">
+                        <h3>Láminas</h3>
+                        <div id="resLaminas"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 3: PANEL DE ADMINISTRACIÓN -->
+        <section id="vistaAdmin" class="oculto" aria-label="Panel de Administración">
+            <div class="encabezado-admin">
+                <div>
+                    <h2>Panel de Administración de Usuarios</h2>
+                    <p class="texto-secundario">
+                        Crea cuentas nuevas y controla el acceso en tiempo real.
+                    </p>
+                </div>
+                <button type="button" id="btnVolverCalculadora" class="btn-secundario">
+                    Volver a la Calculadora
+                </button>
+            </div>
+
+            <div id="alertaAdmin" class="alerta oculto" role="alert"></div>
+
+            <div class="panel-admin-grid">
+                <div class="card">
+                    <h3>Crear Nuevo Usuario</h3>
+                    <form id="formularioCrearUsuario" class="formulario-vertical" novalidate>
+                        <div class="input-group">
+                            <label for="nuevoUsername">Nombre de usuario</label>
+                            <input
+                                type="text"
+                                id="nuevoUsername"
+                                placeholder="Ej. ingeniero1"
+                                minlength="3"
+                                required
+                            >
+                        </div>
+
+                        <div class="input-group">
+                            <label for="nuevoPassword">Contraseña</label>
+                            <input
+                                type="password"
+                                id="nuevoPassword"
+                                placeholder="Mínimo 6 caracteres"
+                                minlength="6"
+                                required
+                            >
+                        </div>
+
+                        <div class="input-group">
+                            <label for="nuevoRol">Rol</label>
+                            <select id="nuevoRol">
+                                <option value="usuario">Usuario</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="btnCrearUsuario" class="main-btn">
+                            CREAR USUARIO
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="encabezado-tabla">
+                        <h3>Usuarios Registrados</h3>
+                        <button type="button" id="btnRecargarUsuarios" class="btn-ligero">
+                            Actualizar
+                        </button>
+                    </div>
+
+                    <div class="tabla-responsiva">
+                        <table class="tabla-usuarios">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acceso</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaUsuarios">
+                                <tr>
+                                    <td colspan="5" class="texto-centrado">
+                                        Cargando usuarios...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
